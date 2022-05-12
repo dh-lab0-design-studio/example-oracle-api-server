@@ -1,6 +1,8 @@
 using System.Globalization;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using OracleApiServer.Database.Interfaces;
+using OracleApiServer.Models;
 
 namespace OracleApiServer.Controllers;
 
@@ -16,8 +18,9 @@ public class SystemController : BaseApiController
     }
 
     [HttpGet("s")]
-    public string GetConnectString()
+    public JsonOutput GetConnectString()
     {
-        return _countries.GetCountries();
+        var trim = _countries.GetCountries().Trim();
+        return JsonSerializer.Deserialize<JsonOutput>(trim) ?? new JsonOutput();
     }
 }

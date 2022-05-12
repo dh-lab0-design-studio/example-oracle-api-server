@@ -14,20 +14,30 @@ public class DatabaseAccessService : IDatabaseAccessService
         _configManager = configManager;
     }
 
-    public IDbConnection GetConnection() => new OracleConnection(_configManager.GetConnectionString());
-    public IDbCommand GetCommand(string sqlOrProcedure = "")
+    public OracleConnection GetConnection() => new(_configManager.GetConnectionString());
+    public OracleCommand GetCommand()
     {
         var conn = this.GetConnection();
         conn.Open();
         var cmd = conn.CreateCommand();
-        if (sqlOrProcedure.IsEmpty()) return cmd;
-        cmd.CommandType = CommandType.Text;
-        cmd.CommandText = sqlOrProcedure;
         return cmd;
     }
 
-    public IDataReader GetReader(IDbCommand cmd)
+    public OracleCommand GetCommandSql(string sql)
     {
-        return cmd.ExecuteReader();
+        var cmd = GetCommand();
+        cmd.CommandType = CommandType.Text;
+        cmd.CommandText = sql;
+        return cmd;
     }
+
+    public OracleCommand GetCommandProcedure(string procedure)
+    {
+        var cmd = GetCommand();
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.CommandText = procedure;
+        return cmd;
+    }
+
+    public OracleDataReader GetReader(OracleCommand cmd) => cmd.ExecuteReader();
 }

@@ -1,4 +1,6 @@
 using System.Data;
+using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 using OracleApiServer.Database.Interfaces;
 
 namespace OracleApiServer.Database.Services;
@@ -14,16 +16,10 @@ public class CountriesQueryService : ICountriesQueryService
 
     public string GetCountries()
     {
-        using var cmdGetCountries = _access.GetCommand();
-        cmdGetCountries.CommandText = "GET_COUNTRIES";
-        cmdGetCountries.CommandType = CommandType.StoredProcedure;
-        var outParam = cmdGetCountries.CreateParameter();
-        outParam.Direction = ParameterDirection.Output;
-        outParam.DbType = DbType.String;
-        outParam.ParameterName = "P_JSON_OUT";
-        outParam.Size = 32767;
+        using var cmdGetCountries = _access.GetCommandProcedure("GET_COUNTRIES");
+        var outParam = new OracleParameter("P_JSON_OUT", OracleDbType.Clob, ParameterDirection.Output);
         cmdGetCountries.Parameters.Add(outParam);
         cmdGetCountries.ExecuteNonQuery();
-        return outParam.Value?.ToString() ?? string.Empty;
+        return ((OracleClob)outParam.Value).Value;
     }
 }

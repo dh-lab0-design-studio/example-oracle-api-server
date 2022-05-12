@@ -1,11 +1,14 @@
 using System.Data;
+using Oracle.ManagedDataAccess.Client;
 
 namespace OracleApiServer.Database.Interfaces;
 
 public interface IDatabaseAccessService
 {
-    public IDbConnection GetConnection();
-    public IDbCommand GetCommand(string sqlOrProcedure = "");
-    public IDataReader GetReader(IDbCommand cmd);
+    public OracleConnection GetConnection();
+    public OracleCommand GetCommand();
+    public OracleCommand GetCommandSql(string sql);
+    public OracleCommand GetCommandProcedure(string procedure);
+    public OracleDataReader GetReader(OracleCommand cmd);
     
 }
